@@ -60,3 +60,4 @@
     - server.ini
     - local_env.sh
     - job_metrics_conf.xml
+    - dependency_resolvers_conf.xml
