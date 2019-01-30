@@ -13,7 +13,7 @@
   with_items:
     - pip
     - setuptools
-  when: pulsar_pip_install == true
+  when: pulsar_pip_install
 
 - name: Install Pulsar (git+pip)
   pip:
@@ -21,22 +21,22 @@
     virtualenv: "{{ pulsar_venv_dir }}"
     editable: false
     state: forcereinstall
-  when: pulsar_pip_install == true and pulsar_changeset_id is defined
+  when: pulsar_pip_install and pulsar_changeset_id is defined
 
 - name: Install Pulsar (pip)
   pip:
     name: pulsar-app
     state: latest
     virtualenv: "{{ pulsar_venv_dir }}"
-  when: pulsar_pip_install == true and pulsar_changeset_id is not defined
+  when: pulsar_pip_install and pulsar_changeset_id is not defined
 
 - name: Install Pulsar (source)
   git: dest={{ pulsar_server_dir }} force=no repo={{ pulsar_git_repo }} version={{ pulsar_changeset_id | default('master') }} executable={{ git_executable | default(omit) }}
-  when: pulsar_pip_install == false
+  when: not pulsar_pip_install
 
 - name: Install Pulsar base dependencies for source install
   pip: requirements={{ pulsar_server_dir }}/requirements.txt virtualenv={{ pulsar_venv_dir }} virtualenv_command={{ pip_virtualenv_command | default(omit) }}
-  when: pulsar_pip_install == false
+  when: not pulsar_pip_install
 
 - name: Install Pulsar dependencies (optional)
   pip: name={{ item }} virtualenv={{ pulsar_venv_dir }} virtualenv_command={{ pip_virtualenv_command | default(omit) }}
