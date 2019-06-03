@@ -39,6 +39,8 @@ pulsar_optional_dependencies: []
 # variables can be used to target other paths.
 pulsar_install_environments: {}
 
+# If you have the Galaxy configuration hosted in a public repository,
+# you can enable this option to easily have in-sync the job metrics file
 # see: https://docs.galaxyproject.org/en/master/admin/special_topics/job_metrics.html#pulsar
 pulsar_sync_job_metrics: false
-pulsar_job_metrics_file_from_galaxy_config: https://github.com/...
+pulsar_job_metrics_file_from_galaxy_config: https://raw.githubusercontent.com/...
