@@ -15,7 +15,7 @@ host = {{ pulsar_host }}
 ## pem file to use to enable SSL. Set to * to generate one
 ## automatically.
 {% if pulsar_ssl_pem is defined %}
-ssl_pem = host.pem
+ssl_pem = {{ pulsar_ssl_pem }}
 {% endif %}
 
 [app:main]
