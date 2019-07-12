@@ -39,14 +39,8 @@ pulsar_optional_dependencies: []
 # variables can be used to target other paths.
 pulsar_install_environments: []
 
-pulsar_owner: root
-pulsar_group: root
-pulsar_user_create: false
-pulsar_user_homedir: "{{ pulsar_config_dir }}"
-
-pulsar_config_filemode: 0444
-pulsar_config_backup: true
 # To deploy a systemd unit file
 # pulsar_systemd: true
-pulsar_systemd_enabled: yes
+pulsar_systemd: false
+pulsar_systemd_enabled: true
 pulsar_systemd_state: started

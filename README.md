@@ -205,5 +205,6 @@ License
 Author Information
 ------------------
 
-[John Chilton](https://github.com/jmchilton)
-[Nate Coraor](https://github.com/natefoo)
+- [John Chilton](https://github.com/jmchilton)
+- [Nate Coraor](https://github.com/natefoo)
+- [Helena Rasche](https://github.com/erasche)
