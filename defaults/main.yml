@@ -37,7 +37,7 @@ pulsar_optional_dependencies: []
 # If development packages dependent to the optional modules (e.g. curl,
 # OpenSSL, libffi) are not installed system wide on destination, environment
 # variables can be used to target other paths.
-pulsar_install_environments: []
+pulsar_install_environments: {}
 
 # To deploy a systemd unit file
 # pulsar_systemd: true
