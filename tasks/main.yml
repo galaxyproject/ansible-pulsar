@@ -4,6 +4,14 @@
 # Deploy a Pulsar server
 #   http://pulsar.readthedocs.org/
 
+- name: Ensure pip and virtualenv commands are available
+  package:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - python-pip
+    - python-virtualenv
+
 - name: Create/update virtualenv
   pip:
     name: "{{ item }}"
@@ -61,3 +69,6 @@
     - local_env.sh
     - job_metrics_conf.xml
     - dependency_resolvers_conf.xml
+
+- include_tasks: systemd.yml
+  when: pulsar_systemd

@@ -1,0 +1,12 @@
+---
+- name: Create Pulsar systemd unit file
+  template:
+    src: "pulsar.service.j2"
+    dest: "/etc/systemd/system/pulsar.service"
+
+- name: SystemD daemon-reload and enable/start service
+  systemd:
+    state: "{{ pulsar_systemd_state }}"
+    enabled: "{{ pulsar_systemd_enabled }}"
+    name: pulsar.service
+    daemon_reload: yes

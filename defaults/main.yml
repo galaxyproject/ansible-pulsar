@@ -38,3 +38,9 @@ pulsar_optional_dependencies: []
 # OpenSSL, libffi) are not installed system wide on destination, environment
 # variables can be used to target other paths.
 pulsar_install_environments: {}
+
+# To deploy a systemd unit file
+# pulsar_systemd: true
+pulsar_systemd: false
+pulsar_systemd_enabled: true
+pulsar_systemd_state: started

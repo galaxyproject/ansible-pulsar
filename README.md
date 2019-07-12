@@ -17,14 +17,14 @@ easily be installed via a pre-task in the same play as this role:
 
     - hosts: pulsarservers
         pre_tasks:
-          - name: Install Mercurial
+          - name: Install git
             apt: pkg={{ item }} state=installed
             sudo: yes
             when: ansible_os_family = 'Debian'
             with_items:
               - git
               - python-virtualenv
-          - name: Install Mercurial
+          - name: Install git
             yum: pkg={{ item }} state=installed
             sudo: yes
             when: ansible_os_family = 'RedHat'
@@ -187,9 +187,6 @@ Install Pulsar with directory separation and also install Galaxy:
         galaxy_config_files:
           - name: files/galaxy/config/datatypes_conf.xml
             dest: "{{ galaxy_config_dir }}/datatypes_conf.xml"
-      pre_tasks:
-        - name: Install Mercurial
-          pip: name=mercurial virtualenv={{ hg_virtualenv }} virtualenv_command={{ pip_virtualenv_command | default(omit) }}
       roles:
         - role: galaxyproject.pulsar
         # Install with:
@@ -208,5 +205,6 @@ License
 Author Information
 ------------------
 
-[John Chilton](https://github.com/jmchilton)  
-[Nate Coraor](https://github.com/natefoo)
+- [John Chilton](https://github.com/jmchilton)
+- [Nate Coraor](https://github.com/natefoo)
+- [Helena Rasche](https://github.com/erasche)
