@@ -4,6 +4,18 @@
 # Deploy a Pulsar server
 #   http://pulsar.readthedocs.org/
 
+
+# More copying from galaxy role:
+# To my knowledge there is no other way to know whether or not the consumer of
+# this role has set `become: true` outside this role, and `become: {{ foo |
+# default(omit) }}` on a task/block actually clobbers the higher level use of
+# `become`. This is a temporary solution.
+- name: Set privilege separation default variables
+  set_fact:
+    __pulsar_remote_user: "{{ ansible_user | default(omit) }}"
+    __pulsar_become: "{{ ansible_env.SUDO_USER is defined }}"
+    __pulsar_become_user: "{{ ansible_user_id | default(omit) }}"
+
 - name: Include virtualenv setup tasks
   import_tasks: virtualenv.yml
 
