@@ -41,15 +41,6 @@
         mode: "{{ __pulsar_dir_perms }}"
       when: pulsar_root is defined
 
-    - name: Create additional privilege separated directories
-      file:
-        path: "{{ item }}"
-        state: directory
-        owner: "{{ __pulsar_privsep_user_name }}"
-        group: "{{ __pulsar_privsep_user_group }}"
-        mode: "{{ __pulsar_dir_perms }}"
-      with_items: "{{ pulsar_privsep_dirs }}"
-
     - name: Create additional directories
       file:
         path: "{{ item }}"

@@ -112,3 +112,9 @@ __pulsar_privsep_user_name: "{{ pulsar_privsep_user.name | default(pulsar_privse
 # If `pulsar_create_user` is enabled, the privsep user will also be created, but you can override this behavior
 pulsar_create_privsep_user: "{{ pulsar_create_user if __pulsar_privsep_user_name != 'root' else false }}"
 
+# Directories to create as the Pulsar user
+pulsar_dirs:
+  - "{{ pulsar_dependencies_dir }}"
+  - "{{ pulsar_persistence_dir }}"
+  - "{{ pulsar_staging_dir }}"
+  - "{{ pulsar_config_dir }}"
