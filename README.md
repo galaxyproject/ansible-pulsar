@@ -17,20 +17,23 @@ easily be installed via a pre-task in the same play as this role:
 
     - hosts: pulsarservers
         pre_tasks:
-          - name: Install git
-            apt: pkg={{ item }} state=installed
-            sudo: yes
+          - name: Install dependencies
+            package:
+              name:
+                - git
+                - virtualenv
+                - python3
+            become: true
             when: ansible_os_family = 'Debian'
-            with_items:
-              - git
-              - python-virtualenv
-          - name: Install git
-            yum: pkg={{ item }} state=installed
-            sudo: yes
+          - name: Install dependencies
+            package:
+              name:
+                - git
+                - python36-virtualenv
+                - python3
+              state: present
+            become: true
             when: ansible_os_family = 'RedHat'
-            with_items:
-              - git
-              - python-virtualenv
         roles:
           - galaxyproject.pulsar
 

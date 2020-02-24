@@ -4,20 +4,18 @@
 # Deploy a Pulsar server
 #   http://pulsar.readthedocs.org/
 
-- name: Ensure pip and virtualenv commands are available
-  package:
-    name: "{{ item }}"
-    state: installed
-  with_items:
-    - python-pip
-    - python-virtualenv
+- name: Include virtualenv setup tasks
+  import_tasks: virtualenv.yml
 
 - name: Create/update virtualenv
   pip:
     name: "{{ item }}"
     state: latest
-    virtualenv: "{{ pulsar_venv_dir }}"
-    virtualenv_command: "{{ pip_virtualenv_command | default(omit) }}"
+    extra_args: "{{ pip_extra_args | default('') }}"
+    virtualenv_command: "{{ pulsar_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
+    virtualenv_python: "{{ pulsar_virtualenv_python | default(omit) }}"
+  environment:
+    VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
   with_items:
     - pip
     - setuptools
@@ -26,7 +24,6 @@
 - name: Install Pulsar (git+pip)
   pip:
     name: "{{ 'git+' ~ pulsar_git_repo ~ '@' ~ pulsar_changeset_id ~ '#egg=pulsar-app' }}"
-    virtualenv: "{{ pulsar_venv_dir }}"
     editable: false
     state: forcereinstall
   when: pulsar_pip_install == true and pulsar_changeset_id is defined
@@ -36,6 +33,12 @@
     name: pulsar-app
     state: latest
     virtualenv: "{{ pulsar_venv_dir }}"
+    extra_args: "{{ pip_extra_args | default('') }}"
+    virtualenv_command: "{{ pulsar_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
+    virtualenv_python: "{{ pulsar_virtualenv_python | default(omit) }}"
+  environment:
+    PYTHONPATH: null
+    VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
   when: pulsar_pip_install == true and pulsar_changeset_id is not defined
 
 - name: Install Pulsar (source)
@@ -43,11 +46,27 @@
   when: pulsar_pip_install == false
 
 - name: Install Pulsar base dependencies for source install
-  pip: requirements={{ pulsar_server_dir }}/requirements.txt virtualenv={{ pulsar_venv_dir }} virtualenv_command={{ pip_virtualenv_command | default(omit) }}
+  pip:
+    requirements: "{{ pulsar_server_dir }}/requirements.txt"
+    virtualenv: "{{ pulsar_venv_dir }}"
+    extra_args: "{{ pip_extra_args | default('') }}"
+    virtualenv_command: "{{ pulsar_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
+    virtualenv_python: "{{ pulsar_virtualenv_python | default(omit) }}"
+  environment:
+    PYTHONPATH: null
+    VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
   when: pulsar_pip_install == false
 
 - name: Install Pulsar dependencies (optional)
-  pip: name={{ item }} virtualenv={{ pulsar_venv_dir }} virtualenv_command={{ pip_virtualenv_command | default(omit) }}
+  pip:
+    name: "{{ item }}"
+    virtualenv: "{{ pulsar_venv_dir }}"
+    extra_args: "{{ pip_extra_args | default('') }}"
+    virtualenv_command: "{{ pulsar_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
+    virtualenv_python: "{{ pulsar_virtualenv_python | default(omit) }}"
+  environment:
+    PYTHONPATH: null
+    VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
   #environment: "{{ pulsar_install_environments[item.split('=')[0]] if item.split('=')[0] in pulsar_install_environments else {} }}"
   with_items: "{{ pulsar_optional_dependencies }}"
 
