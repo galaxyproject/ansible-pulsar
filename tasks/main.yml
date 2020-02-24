@@ -20,6 +20,9 @@
   include_tasks: user.yml
   when: pulsar_create_user or pulsar_create_privsep_user
 
+- name: Include path management tasks
+  include_tasks: paths.yml
+
 - name: Include virtualenv setup tasks
   include_tasks: virtualenv.yml
 
