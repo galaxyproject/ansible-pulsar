@@ -50,7 +50,7 @@
     virtualenv_python: "{{ pulsar_virtualenv_python | default(omit) }}"
   environment:
     PYTHONPATH: null
-    VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
+    VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
   when: pulsar_pip_install == true and pulsar_changeset_id is not defined
 
 - name: Install Pulsar (source)
@@ -66,7 +66,7 @@
     virtualenv_python: "{{ pulsar_virtualenv_python | default(omit) }}"
   environment:
     PYTHONPATH: null
-    VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
+    VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
   when: pulsar_pip_install == false
 
 - name: Install Pulsar dependencies (optional)
@@ -78,7 +78,7 @@
     virtualenv_python: "{{ pulsar_virtualenv_python | default(omit) }}"
   environment:
     PYTHONPATH: null
-    VIRTUAL_ENV: "{{ galaxy_venv_dir }}"
+    VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
   #environment: "{{ pulsar_install_environments[item.split('=')[0]] if item.split('=')[0] in pulsar_install_environments else {} }}"
   with_items: "{{ pulsar_optional_dependencies }}"
 
