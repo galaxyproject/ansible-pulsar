@@ -44,6 +44,11 @@ pulsar_systemd_enabled: true
 pulsar_systemd_state: started
 pulsar_systemd_memory_limit: 6 # Gigabytes
 
+
+# User management
+pulsar_create_user: no
+
+
 #
 # Access method control
 #
