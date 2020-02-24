@@ -1,0 +1,41 @@
+---
+- name: Create users
+  block:
+
+    - name: Create pulsar group
+      group:
+        name: "{{ pulsar_group.name | default(pulsar_group) }}"
+        gid: "{{ pulsar_group.gid | default(omit) }}"
+        system: "{{ pulsar_group.system | default(pulsar_user.system) | default('true') }}"
+        local: "{{ pulsar_group.local | default(pulsar_user.local) | default(omit) }}"
+      when: pulsar_group is defined
+
+    - name: Create pulsar user
+      user:
+        name: "{{ pulsar_user.name | default(pulsar_user) }}"
+        uid: "{{ pulsar_user.uid | default(omit) }}"
+        group: "{{ (pulsar_group | default({})).name | default(pulsar_group) | default(omit) }}"
+        comment: "{{ pulsar_user.comment | default('pulsar server') }}"
+        create_home: "{{ pulsar_user.create_home | default('true') }}"
+        home: "{{ pulsar_user.home | default(omit) }}"
+        shell: "{{ pulsar_user.shell | default(omit) }}"
+        system: "{{ pulsar_user.system | default('true') }}"
+        local: "{{ pulsar_user.local | default(omit) }}"
+      when: pulsar_create_user
+
+    - name: Create pulsar privilege separation user
+      user:
+        name: "{{ pulsar_privsep_user.name | default(pulsar_privsep_user) }}"
+        uid: "{{ pulsar_privsep_user.uid | default(omit) }}"
+        group: "{{ (pulsar_group | default({})).name | default(pulsar_group) | default(omit) }}"
+        comment: "{{ pulsar_privsep_user.comment | default('pulsar server privilege separation') }}"
+        create_home: "{{ pulsar_privsep_user.create_home | default('true') }}"
+        home: "{{ pulsar_privsep_user.home | default(omit) }}"
+        shell: "{{ pulsar_privsep_user.shell | default(omit) }}"
+        system: "{{ pulsar_privsep_user.system | default('true') }}"
+        local: "{{ pulsar_privsep_user.local | default(omit) }}"
+      when: pulsar_create_privsep_user
+
+  remote_user: "{{ pulsar_remote_users.root | default(__pulsar_remote_user) }}"
+  become: "{{ true if pulsar_become_users.root is defined else __pulsar_become }}"
+  become_user: "{{ pulsar_become_users.root | default(__pulsar_become_user) }}"

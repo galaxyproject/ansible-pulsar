@@ -2,8 +2,6 @@
 # defaults file for galaxyproject.pulsar
 
 # High-level Pulsar configuration parameters
-pulsar_pip_install: false
-pulsar_git_repo: https://github.com/galaxyproject/pulsar
 pulsar_job_managers_config: "{{ pulsar_config_dir }}/job_managers.ini"
 pulsar_job_metrics_config_file: "{{ pulsar_config_dir }}/job_metrics_conf.xml"
 
@@ -44,3 +42,68 @@ pulsar_install_environments: {}
 pulsar_systemd: false
 pulsar_systemd_enabled: true
 pulsar_systemd_state: started
+pulsar_systemd_memory_limit: 6 # Gigabytes
+
+#
+# Access method control
+#
+
+# The role needs to perform tasks as different users depending on your configuration and how you are connecting to the
+# target host. Keys are the privileges needed and the values are the user to connect as or become:
+#
+#   root: Tasks that require "root" privileges such as creating/chowning directories inside directories owned by root
+#   pulsar: Tasks that run as the pulsar user
+#   privsep: Tasks that run as the privilege separation user
+#   errdocs: Tasks that install error docs (run as whatever user owns these)
+#
+# You would most commonly connect to the target host either as root or as a user with full sudo privileges, but if not
+# using privilege separation, it is possible to run this role as an unprivileged user with no escalation. In such a
+# case, set `pulsar_become_users` to an empty hash like so:
+#
+#pulsar_become_users: {}
+
+# Attempt to automatically decide whether to use `become` and which users to `become`. To disable, set
+# `pulsar_become_users` to an empty hash.
+__pulsar_privsep_user: "{{ pulsar_privsep_user if pulsar_separate_privileges else pulsar_user }}"
+# this goes through two levels of variables since there's no "else if"
+__pulsar_default_root_become_users:
+  pulsar: "{{ __pulsar_user_name }}"
+  privsep: "{{ __pulsar_privsep_user_name }}"
+__pulsar_default_nonroot_become_users:
+  root: root
+  pulsar: "{{ __pulsar_user_name }}"
+  privsep: "{{ __pulsar_privsep_user_name }}"
+__pulsar_default_become_users: "{{ __pulsar_default_root_become_users if ansible_user_uid == 0 else __pulsar_default_nonroot_become_users }}"
+pulsar_become_users: "{{ {} if ansible_user_id == __pulsar_user_name and not pulsar_separate_privileges else __pulsar_default_become_users }}"
+
+# Some sites do not allow the use of passwordless `sudo` and require logging directly in to accounts using `ssh`, this
+# variable works like `pulsar_become_users` and accommodates such scenarios (if using you probably want to set
+# `pulsar_become_users` to an empty hash)
+pulsar_remote_users: {}
+
+#
+# Privilege separation, user and path management
+#
+
+# Privilege separation mode switch
+pulsar_separate_privileges: no
+
+# User that pulsar runs as
+pulsar_user: "{{ ansible_user_id }}"
+
+# User that owns pulsar code, configs, and virutalenv, and that runs `pip install` for dependencies
+pulsar_privsep_user: root
+
+# No explicit group is created by default, system policy will decide users' groups. However, in order to enable
+# privilege separation without making configs world-readable, the users should share a common group. This group will be
+# created if `pulsar_create_user` is enabled and it does not exist. Ideally this is the primary group of `pulsar_user`,
+# on most Linux systems, just set this to the same value as `pulsar_user` if you want to enable this feature.
+#pulsar_group:
+
+# Because these vars can be either a bare username or a dict
+__pulsar_user_name: "{{ pulsar_user.name | default(pulsar_user) }}"
+__pulsar_privsep_user_name: "{{ pulsar_privsep_user.name | default(pulsar_privsep_user) }}"
+
+# If `pulsar_create_user` is enabled, the privsep user will also be created, but you can override this behavior
+pulsar_create_privsep_user: "{{ pulsar_create_user if __pulsar_privsep_user_name != 'root' else false }}"
+

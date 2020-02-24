@@ -1,0 +1,7 @@
+---
+# defaults file for galaxyproject.galaxy
+
+# TODO: Magical restarters depending on how you're running pulsar.
+- name: default restart pulsar handler
+  debug:
+    msg: "RESTARTER NOT IMPLEMENTED - Please restart pulsar manually. You can define your own handler and enable it with `pulsar_restart_handler_name`"
