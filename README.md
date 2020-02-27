@@ -47,7 +47,7 @@ the `pip_virtualenv_command` variable.
 Breaking Changes
 ----------------
 
-As of 1.0.0, installation with git+pip, and from source, are no longer supported.
+As of 1.0.0, installation directly from source using `git clone` is no longer supported. However, `pulsar_package_name` and `pulsar_package_version` can be used to install using pip's `git+https` method.
 
 Role Variables
 --------------
