@@ -17,20 +17,23 @@ easily be installed via a pre-task in the same play as this role:
 
     - hosts: pulsarservers
         pre_tasks:
-          - name: Install git
-            apt: pkg={{ item }} state=installed
-            sudo: yes
+          - name: Install dependencies
+            package:
+              name:
+                - git
+                - virtualenv
+                - python3
+            become: true
             when: ansible_os_family = 'Debian'
-            with_items:
-              - git
-              - python-virtualenv
-          - name: Install git
-            yum: pkg={{ item }} state=installed
-            sudo: yes
+          - name: Install dependencies
+            package:
+              name:
+                - git
+                - python36-virtualenv
+                - python3
+              state: present
+            become: true
             when: ansible_os_family = 'RedHat'
-            with_items:
-              - git
-              - python-virtualenv
         roles:
           - galaxyproject.pulsar
 
@@ -40,6 +43,11 @@ the `pip_virtualenv_command` variable.
 [git]: http://git-scm.com/
 [venv]: http://virtualenv.readthedocs.org/
 [pip]: http://pip.readthedocs.org/
+
+Breaking Changes
+----------------
+
+As of 1.0.0, installation directly from source using `git clone` is no longer supported. However, `pulsar_package_name` and `pulsar_package_version` can be used to install using pip's `git+https` method.
 
 Role Variables
 --------------
@@ -57,17 +65,8 @@ Role Variables
 You can control various things about where you get Pulsar from, what version
 you use, and where its configuration files will be placed:
 
-- `pulsar_pip_install` (default: `false`): For legacy reasons, this role will
-  install Pulsar by cloning it from git. If set to `true`, Pulsar will be
-  installed from pip instead.
 - `pulsar_yaml_config`: a YAML dictionary whose contents will be used to create
   Pulsar's app.yml
-- `pulsar_git_repo` (default: `https://github.com/galaxyproject/pulsar`):
-  Upstream git repository from which Pulsar should be cloned.
-- `pulsar_changeset_id` (default: `master`): A changeset id, tag, branch, or
-  other valid git identifier for which changeset Pulsar should be updated to.
-  This is also possible when installing from pip (pulsar will be installed
-  using the `git+https://` pip scheme).
 - `pulsar_venv_dir` (default: `<pulsar_server_dir>/venv` if installing via pip,
   `<pulsar_server_dir>/.venv` if not): The role will create a
   [virtualenv][virtualenv] from which Pulsar will run, this controls where the
@@ -80,6 +79,21 @@ you use, and where its configuration files will be placed:
   you are enabling.
 - `pulsar_install_environments` (default: None): Installing dependencies may
   require setting certain environment variables to compile successfully.
+
+
+**User management and privilege separation**
+
+- `pulsar_separate_privileges` (default: `no`): Enable privilege separation mode.
+- `pulsar_user` (default: user running ansible): The name of the system user under which pulsar runs. (or, `{name: pulsar, shell: /bin/bash}`)
+- `pulsar_privsep_user` (default: `root`): The name of the system user that owns the pulsar code, config files, and
+  virtualenv (and dependencies therein).
+- `pulsar_group`: Common group between the pulsar user and privilege separation
+  user. If set directories containing potentially sensitive information such as
+  the pulsar config file will be created group- but not world-readable.
+  Otherwise, directories are created world-readable.
+- `pulsar_create_user` (default: `no`): Create the pulsar user. Running as a dedicated user is a best practice, but most
+  production pulsar instances submitting jobs to a cluster will manage users in a directory service (e.g.  LDAP). This
+  option is useful for standalone servers. Requires superuser privileges.
 
 
 Additional options from Pulsar's `server.ini` are configurable via the

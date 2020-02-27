@@ -1,10 +1,23 @@
 [Unit]
 Description=Pulsar
-After=syslog.target network.target
+After=network.target
+After=time-sync.target
+After=syslog.target
 
 [Service]
+UMask=022
 Type=simple
+User={{ __pulsar_user_name }}
+Group={{ __pulsar_user_group }}
+WorkingDirectory={{ pulsar_server_dir }}
+TimeoutStartSec=30
 ExecStart={{ pulsar_venv_dir }}/bin/python {{ pulsar_venv_dir }}/bin/paster serve {{ pulsar_config_dir }}/server.ini
+MemoryLimit={{ pulsar_systemd_memory_limit }}G
+Restart=always
+
+MemoryAccounting=yes
+CPUAccounting=yes
+BlockIOAccounting=yes
 
 [Install]
 WantedBy=multi-user.target

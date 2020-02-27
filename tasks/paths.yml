@@ -1,0 +1,56 @@
+---
+- name: Manage Paths
+  block:
+
+    - name: Get group IDs for pulsar users
+      getent:
+        database: passwd
+        key: "{{ item }}"
+      with_items:
+        - "{{ __pulsar_user_name }}"
+        - "{{ __pulsar_privsep_user_name }}"
+      when: pulsar_group is not defined
+      register: __pulsar_passwd_result
+
+    - name: Get group names for pulsar users
+      getent:
+        database: group
+        key: "{{ item.ansible_facts.getent_passwd[item.invocation.module_args.key][2] }}"
+      with_items: "{{ __pulsar_passwd_result.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: pulsar_group is not defined
+      register: __pulsar_group_result
+
+    - name: Set pulsar user facts
+      set_fact:
+        __pulsar_user_group: "{{ ((pulsar_group | default({})).name | default(pulsar_group)) if pulsar_group is defined else (__pulsar_group_result.results[0].ansible_facts.getent_group.keys() | first) }}"
+        __pulsar_privsep_user_group: "{{ ((pulsar_group | default({})).name | default(pulsar_group)) if pulsar_group is defined else (__pulsar_group_result.results[1].ansible_facts.getent_group.keys() | first) }}"
+
+    - name: Determine whether to restrict to group permissions
+      set_fact:
+        __pulsar_dir_perms: "{{ '0750' if __pulsar_user_group == __pulsar_privsep_user_group else '0755' }}"
+
+    # try to become root. if you need something fancier, don't use the role and write your own
+    - name: Create pulsar_root
+      file:
+        path: "{{ pulsar_root }}"
+        state: directory
+        owner: "{{ __pulsar_privsep_user_name }}"
+        group: "{{ __pulsar_privsep_user_group }}"
+        mode: "{{ __pulsar_dir_perms }}"
+      when: pulsar_root is defined
+
+    - name: Create additional directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ __pulsar_user_name }}"
+        group: "{{ __pulsar_user_group }}"
+        mode: "{{ __pulsar_dir_perms }}"
+      with_items: "{{ pulsar_dirs }}"
+
+  # TODO: for root squashing it might be useful for this to be separate from other root tasks
+  remote_user: "{{ pulsar_remote_users.root | default(__pulsar_remote_user) }}"
+  become: "{{ true if pulsar_become_users.root is defined else __pulsar_become }}"
+  become_user: "{{ pulsar_become_users.root | default(__pulsar_become_user) }}"

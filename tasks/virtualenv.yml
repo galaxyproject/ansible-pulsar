@@ -1,0 +1,58 @@
+---
+# Copied from galaxyproject.galaxy
+#
+# Having pip installed on $PYTHONPATH can break upgrading it, so we install
+# once with $PYTHONPATH set (in case it's needed for virtualenv) and then once
+# the venv is created we upgrade pip with $PYTHONPATH unset
+
+- name: Manage dependencies
+  block:
+
+    - name: Create Pulsar virtualenv
+      pip:
+        name: pip
+        virtualenv: "{{ pulsar_venv_dir }}"
+        extra_args: "{{ pip_extra_args | default('') }}"
+        virtualenv_command: "{{ pulsar_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
+        virtualenv_python: "{{ pulsar_virtualenv_python | default(omit) }}"
+      environment:
+        VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
+
+    - name: Ensure pip is the latest release
+      pip:
+        name: pip
+        state: latest
+        extra_args: "{{ pip_extra_args | default('') }}"
+        virtualenv: "{{ pulsar_venv_dir }}"
+        virtualenv_command: "{{ pulsar_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
+      environment:
+        PYTHONPATH: null
+        VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
+
+    - name: Install Pulsar
+      pip:
+        name: "{{ pulsar_package_name }}"
+        version: "{{ pulsar_package_version | default(omit) }}"
+        state: latest
+        virtualenv: "{{ pulsar_venv_dir }}"
+        extra_args: "{{ pip_extra_args | default('') }}"
+        virtualenv_command: "{{ pulsar_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
+        virtualenv_python: "{{ pulsar_virtualenv_python | default(omit) }}"
+      environment:
+        PYTHONPATH: null
+        VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
+
+    - name: Install Pulsar dependencies (optional)
+      pip:
+        name: "{{ pulsar_optional_dependencies }}"
+        virtualenv: "{{ pulsar_venv_dir }}"
+        extra_args: "{{ pip_extra_args | default('') }}"
+        virtualenv_command: "{{ pulsar_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
+        virtualenv_python: "{{ pulsar_virtualenv_python | default(omit) }}"
+      environment:
+        PYTHONPATH: null
+        VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
+
+  remote_user: "{{ pulsar_remote_users.privsep | default(__pulsar_remote_user) }}"
+  become: "{{ true if pulsar_become_users.privsep is defined else __pulsar_become }}"
+  become_user: "{{ pulsar_become_users.privsep | default(__pulsar_become_user) }}"
