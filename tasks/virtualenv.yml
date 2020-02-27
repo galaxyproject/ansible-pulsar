@@ -31,7 +31,8 @@
 
     - name: Install Pulsar
       pip:
-        name: pulsar-app
+        name: "{{ pulsar_package_name }}"
+        vesion: "{{ pulsar_package_version | default(omit) }}"
         state: latest
         virtualenv: "{{ pulsar_venv_dir }}"
         extra_args: "{{ pip_extra_args | default('') }}"

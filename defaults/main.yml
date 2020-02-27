@@ -1,5 +1,7 @@
 ---
 # defaults file for galaxyproject.pulsar
+pulsar_package_name: pulsar-app
+#pulsar_package_version:
 
 # High-level Pulsar configuration parameters
 pulsar_job_managers_config: "{{ pulsar_config_dir }}/job_managers.ini"
