@@ -12,7 +12,7 @@
 
 - name: Set privilege separation default variables
   set_fact:
-    __pulsar_remote_user: "{{ ansible_user | default(omit) }}"
+    __pulsar_remote_user: "{{ ansible_user_id | default(omit) }}"
     __pulsar_become: "{{ ansible_env.SUDO_USER is defined }}"
     __pulsar_become_user: "{{ ansible_user_id | default(omit) }}"
 
