@@ -8,5 +8,5 @@
 - name: default restart pulsar handler
   systemd:
     name: pulsar.service
-    state: started
+    state: restarted
   when: pulsar_systemd
