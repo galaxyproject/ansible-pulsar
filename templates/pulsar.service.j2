@@ -11,7 +11,11 @@ User={{ __pulsar_user_name }}
 Group={{ __pulsar_user_group }}
 WorkingDirectory={{ pulsar_server_dir }}
 TimeoutStartSec=30
+{% if pulsar_systemd_runner == "paste" %}
+ExecStart={{ pulsar_venv_dir }}/bin/python {{ pulsar_venv_dir }}/bin/paster serve {{ pulsar_config_dir }}/server.ini
+{% else %}
 ExecStart={{ pulsar_venv_dir }}/bin/uwsgi --ini-paste {{ pulsar_config_dir }}/server.ini
+{% endif %}
 MemoryLimit={{ pulsar_systemd_memory_limit }}G
 Restart=always
 

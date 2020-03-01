@@ -45,6 +45,7 @@ pulsar_systemd: false
 pulsar_systemd_enabled: true
 pulsar_systemd_state: started
 pulsar_systemd_memory_limit: 6 # Gigabytes
+pulsar_systemd_runner: paste # Or uWSGI, but uwsgi doesn't restart right.
 
 
 # User management
