@@ -54,42 +54,33 @@ Role Variables
 
 ### Required variables ###
 
-- `pulsar_server_dir`: Filesystem path where the Pulsar server will be
-  installed.
-
-**Although not required, you are strongly encouraged to set
-`pulsar_pip_install` to `true` (see below).**
+- `pulsar_root`: Filesystem path under which Pulsar virtualenv, configs, etc. will be installed. Formerly
+  `pulsar_server_dir`
 
 ### Optional variables ###
 
 You can control various things about where you get Pulsar from, what version
 you use, and where its configuration files will be placed:
 
-- `pulsar_yaml_config`: a YAML dictionary whose contents will be used to create
-  Pulsar's app.yml
-- `pulsar_venv_dir` (default: `<pulsar_server_dir>/venv` if installing via pip,
-  `<pulsar_server_dir>/.venv` if not): The role will create a
-  [virtualenv][virtualenv] from which Pulsar will run, this controls where the
-  virtualenv will be placed.
-- `pulsar_config_dir` (default: `<pulsar_server_dir>/config` if installing via
-  pip, `<pulsar_server_dir>` if not): Directory that will be used for Pulsar
-  configuration files.
-- `pulsar_optional_dependencies` (default: None): List of optional dependency
-  modules to install. Whether or not you need these depends on what features
-  you are enabling.
-- `pulsar_install_environments` (default: None): Installing dependencies may
-  require setting certain environment variables to compile successfully.
+- `pulsar_yaml_config`: a YAML dictionary whose contents will be used to create Pulsar's app.yml
+- `pulsar_venv_dir` (default: `<pulsar_root>/venv`): The role will create a [virtualenv][virtualenv] from which Pulsar
+  will run, this controls where the virtualenv will be placed.
+- `pulsar_config_dir` (default: `<pulsar_root>/config`): Directory that will be used for Pulsar configuration files.
+- `pulsar_optional_dependencies` (default: None): List of optional dependency modules to install. Whether or not you
+  need these depends on what features you are enabling.
+- `pulsar_install_environments` (default: None): Installing dependencies may require setting certain environment
+  variables to compile successfully.
 
 
 **User management and privilege separation**
 
 - `pulsar_separate_privileges` (default: `no`): Enable privilege separation mode.
-- `pulsar_user` (default: user running ansible): The name of the system user under which pulsar runs. (or, `{name: pulsar, shell: /bin/bash}`)
+- `pulsar_user` (default: user running ansible): The name of the system user under which pulsar runs. (or,
+  `{name: pulsar, shell: /bin/bash}`)
 - `pulsar_privsep_user` (default: `root`): The name of the system user that owns the pulsar code, config files, and
   virtualenv (and dependencies therein).
-- `pulsar_group`: Common group between the pulsar user and privilege separation
-  user. If set directories containing potentially sensitive information such as
-  the pulsar config file will be created group- but not world-readable.
+- `pulsar_group`: Common group between the pulsar user and privilege separation user. If set directories containing
+  potentially sensitive information such as the pulsar config file will be created group- but not world-readable.
   Otherwise, directories are created world-readable.
 - `pulsar_create_user` (default: `no`): Create the pulsar user. Running as a dedicated user is a best practice, but most
   production pulsar instances submitting jobs to a cluster will manage users in a directory service (e.g.  LDAP). This
@@ -111,10 +102,9 @@ documentation][pulsardocs] and `server.ini.sample`):
 Legacy options (if `pulsar_yaml_config` is unset, these will be used to
 populate the `[app:main]` section of `server.ini`):
 
-- `pulsar_dependencies_dir` (default: `<pulsar_server_dir>/deps`)
-- `pulsar_persistence_dir` (default:
-  `<pulsar_server_dir>/files/persisted_data`)
-- `pulsar_staging_dir` (default: `<pulsar_server_dir>/files/staging`)
+- `pulsar_dependencies_dir` (default: `<pulsar_root>/deps`)
+- `pulsar_persistence_dir` (default: `<pulsar_root>/files/persisted_data`)
+- `pulsar_staging_dir` (default: `<pulsar_root>/files/staging`)
 - `pulsar_drmaa_library_path`
 - `pulsar_job_managers` (default: None): The contents of the legacy job
   managers configuration file (job_managers.ini by default).
@@ -173,7 +163,7 @@ Install Pulsar on your local system with all the default options:
     - hosts: localhost
       connection: local
       vars:
-        pulsar_server_dir: /home/nate/pulsar
+        pulsar_root: /home/nate/pulsar
       roles:
         - role: galaxyproject.pulsar
 
@@ -182,11 +172,9 @@ Install Pulsar with directory separation and also install Galaxy:
 
     - hosts: pulsarservers
       vars:
-        pulsar_venv_dir: /opt/pulsar/venv
-        pulsar_server_dir: /opt/pulsar/server
-        pulsar_config_dir: /opt/pulsar/config
+        pulsar_root: /opt/pulsar
         pulsar_persistence_dir: /var/opt/pulsar/persisted_data
-        pulsar_staging_dir: /var/opt/pulsar/staging"
+        pulsar_staging_dir: /var/opt/pulsar/staging
         pulsar_optional_dependencies:
           - pyOpenSSL
           - pycurl

@@ -3,15 +3,22 @@
 pulsar_package_name: pulsar-app
 #pulsar_package_version:
 
+pulsar_log_level: DEBUG
+
 # High-level Pulsar configuration parameters
 pulsar_job_managers_config: "{{ pulsar_config_dir }}/job_managers.ini"
 pulsar_job_metrics_config_file: "{{ pulsar_config_dir }}/job_metrics_conf.xml"
 
-pulsar_dependencies_dir: "{{ pulsar_server_dir }}/deps"  # {{ galaxy_instance_remote_dir }}/deps
-pulsar_venv_dir: "{{ pulsar_server_dir ~ '/venv' if pulsar_pip_install == true else pulsar_server_dir ~ '/.venv' }}"
-pulsar_persistence_dir: "{{ pulsar_server_dir }}/files/persisted_data"  # {{ galaxy_instance_remote_dir }}/lwr_persisted_data
-pulsar_staging_dir: "{{ pulsar_server_dir }}/files/staging"  # {{ galaxy_instance_remote_dir }}/lwr_staging
-pulsar_config_dir: "{{ pulsar_server_dir ~ '/config' if pulsar_pip_install == true else pulsar_server_dir }}"
+# For legacy purposes
+pulsar_root: "{{ pulsar_server_dir }}"
+
+# Paths
+pulsar_dependencies_dir: "{{ pulsar_root }}/deps"
+pulsar_venv_dir: "{{ pulsar_root }}/venv"
+pulsar_persistence_dir: "{{ pulsar_root }}/files/persisted_data"
+pulsar_staging_dir: "{{ pulsar_root }}/files/staging"
+pulsar_config_dir: "{{ pulsar_root }}/config"
+
 # Optional message queue configuration
 # pulsar_message_queue_url:
 
@@ -22,6 +29,23 @@ pulsar_host: "localhost"
 pulsar_port: 8913
 # Optional ssl key for SSL web server
 # pulsar_ssl_pem:
+
+pulsar_dependency_resolvers:
+  - name: conda
+    #args:
+    #  - name: auto_init
+    #    value: true
+  - name: tool_shed_packages
+  - name: galaxy_packages
+
+pulsar_job_metrics_plugins:
+  - name: core
+  - name: cpuinfo
+    args:
+      - name: verbose
+        value: "true"
+  - name: meminfo
+  - name: uname
 
 # job_managers.ini contents
 #pulsar_job_managers:
