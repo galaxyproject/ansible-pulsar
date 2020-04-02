@@ -3,7 +3,7 @@
   block:
     - name: Create Pulsar systemd unit file
       template:
-        src: "pulsar.service.j2"
+        src: "{{pulsar_systemd_file}}"
         dest: "/etc/systemd/system/pulsar.service"
 
     - name: SystemD daemon-reload and enable/start service

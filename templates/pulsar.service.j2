@@ -16,6 +16,9 @@ ExecStart={{ pulsar_venv_dir }}/bin/python {{ pulsar_venv_dir }}/bin/paster serv
 {% else %}
 ExecStart={{ pulsar_venv_dir }}/bin/uwsgi --ini-paste {{ pulsar_config_dir }}/server.ini
 {% endif %}
+{% if pulsar_drmaa_library_path %}
+Environment=DRMAA_LIBRARY_PATH={{pulsar_drmaa_library_path}}
+{% endif %}
 MemoryLimit={{ pulsar_systemd_memory_limit }}G
 Restart=always
 
