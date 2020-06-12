@@ -197,7 +197,8 @@ Install Pulsar with directory separation and also install Galaxy:
           galaxy_manage_mutable_setup: no
           galaxy_manage_database: no
           
-Install Pulsar with directory separation, systemd service configuration, webless mode and communication via a message queue into a Centos7 host:
+Install Pulsar into a Centos7 host with directory and privilege separation, systemd service configuration, 
+webless mode and communication via a message queue:
 
     - hosts: pulsarservers
       vars:
