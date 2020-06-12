@@ -231,16 +231,16 @@ webless mode and communication via a message queue:
               submit_universe: vanilla
               type: queued_condor    
       pre_tasks:
-      - name: Install dependencies
-        become: yes
-        package:
-          state: latest
-          name:
-          - git
-          - python-virtualenv
-          - python3
-          - curl
-          - libcurl-devel    
+        - name: Install dependencies
+          become: yes
+          package:
+            state: latest
+            name:
+            - git
+            - python-virtualenv
+            - python3
+            - curl
+            - libcurl-devel    
       roles:
         - role: galaxyproject.pulsar
   
