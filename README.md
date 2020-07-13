@@ -196,6 +196,54 @@ Install Pulsar with directory separation and also install Galaxy:
         - role: galaxyproject.galaxy
           galaxy_manage_mutable_setup: no
           galaxy_manage_database: no
+          
+Install Pulsar into a Centos7 host with directory and privilege separation, systemd service configuration, 
+webless mode and communication via a message queue:
+
+    - hosts: pulsarservers
+      vars:
+        pulsar_root: /opt/pulsar
+        pulsar_persistence_dir: /var/opt/pulsar/persisted_data
+        pulsar_staging_dir: /var/opt/pulsar/staging
+        pulsar_dependencies_dir: /var/opt/pulsar/deps
+        pulsar_optional_dependencies:
+          - pycurl
+          - kombu
+          - psutil
+        pulsar_systemd: true
+        pulsar_systemd_runner: webless
+        pulsar_separate_privileges: yes
+        pulsar_privsep_user: centos
+        pulsar_yaml_config:
+          conda_auto_init: true
+          conda_auto_install: true
+          assign_ids: none
+          message_queue_url: "message_queue_url"
+          min_polling_interval: 0.5
+          persistence_directory: "{{ pulsar_persistence_dir }}"
+          staging_directory: "{{ pulsar_staging_dir }}"
+          tool_dependency_dir: "{{ pulsar_dependencies_dir }}"
+          managers:
+            production:
+              submit_universe: vanilla
+              type: queued_condor
+            test:
+              submit_universe: vanilla
+              type: queued_condor    
+      pre_tasks:
+        - name: Install dependencies
+          become: yes
+          package:
+            state: latest
+            name:
+            - git
+            - python-virtualenv
+            - python3
+            - curl
+            - libcurl-devel    
+      roles:
+        - role: galaxyproject.pulsar
+  
 
 License
 -------
