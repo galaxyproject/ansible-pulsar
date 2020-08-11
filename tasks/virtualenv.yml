@@ -52,6 +52,7 @@
       environment:
         PYTHONPATH: null
         VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
+        PYCURL_SSL_LIBRARY: "{{ pulsar_pycurl_ssl_library }}"
 
   remote_user: "{{ pulsar_remote_users.privsep | default(__pulsar_remote_user) }}"
   become: "{{ true if pulsar_become_users.privsep is defined else __pulsar_become }}"
