@@ -149,4 +149,7 @@ pulsar_dirs:
   - "{{ pulsar_dependencies_dir }}"
   - "{{ pulsar_persistence_dir }}"
   - "{{ pulsar_staging_dir }}"
+
+# Directories to create as the privilege separation user
+pulsar_privsep_dirs:
   - "{{ pulsar_config_dir }}"
