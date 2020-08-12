@@ -33,7 +33,6 @@
       pip:
         name: "{{ pulsar_package_name }}"
         version: "{{ pulsar_package_version | default(omit) }}"
-        state: latest
         virtualenv: "{{ pulsar_venv_dir }}"
         extra_args: "{{ pip_extra_args | default('') }}"
         virtualenv_command: "{{ pulsar_virtualenv_command | default(pip_virtualenv_command | default(omit)) }}"
