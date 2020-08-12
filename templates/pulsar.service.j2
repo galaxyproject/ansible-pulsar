@@ -18,6 +18,9 @@ ExecStart={{ pulsar_venv_dir }}/bin/pulsar -c {{ pulsar_config_dir }} -m webless
 {% else %}
 ExecStart={{ pulsar_venv_dir }}/bin/uwsgi --ini-paste {{ pulsar_config_dir }}/server.ini
 {% endif %}
+{% for env in pulsar_systemd_environment %}
+Environment={{ env }}
+{% endfor %}
 MemoryLimit={{ pulsar_systemd_memory_limit }}G
 Restart=always
 
