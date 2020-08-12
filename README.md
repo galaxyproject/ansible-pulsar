@@ -68,8 +68,6 @@ you use, and where its configuration files will be placed:
 - `pulsar_config_dir` (default: `<pulsar_root>/config`): Directory that will be used for Pulsar configuration files.
 - `pulsar_optional_dependencies` (default: None): List of optional dependency modules to install. Whether or not you
   need these depends on what features you are enabling.
-- `pulsar_install_environments` (default: None): Installing dependencies may require setting certain environment
-  variables to compile successfully.
 
 
 **User management and privilege separation**
@@ -133,20 +131,6 @@ Currently, the list of optional dependencies is:
 Many of these dependencies have their own dependencies. A nice future
 enhancement to this role would be to install the dependencies' dependencies via
 the system package manager if desired.
-
-### pulsar_install_environments ###
-
-Some sites may need to set environment variables when installing certain
-modules, e.g. to point pyOpenSSL at a non-standard OpenSSL or libffi locations,
-or to instruct pycurl to use the NSS library:
-
-    pulsar_install_environments:
-      pyOpenSSL:
-        PKG_CONFIG_PATH: "/opt/site/libffi/lib64/pkgconfig"
-        CFLAGS: "-I/opt/site/openssl/include"
-        LDFLAGS: "-L/opt/site/openssl/lib"
-      pycurl:
-        PYCURL_SSL_LIBRARY: "nss"
 
 [pulsardocs]: http://pulsar.readthedocs.org/
 

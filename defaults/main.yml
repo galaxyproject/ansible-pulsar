@@ -58,10 +58,13 @@ pulsar_job_metrics_plugins:
 # List of optional dependency modules to install
 pulsar_optional_dependencies: []
 
-# If development packages dependent to the optional modules (e.g. curl,
-# OpenSSL, libffi) are not installed system wide on destination, environment
-# variables can be used to target other paths.
-pulsar_install_environments: {}
+# PycURL needs to know the SSL backend libcurl is compiled with
+pulsar_pycurl_ssl_library: >-
+  {{
+    'nss' if ansible_os_family == 'RedHat' else (
+    'gnutls' if ansible_os_family == 'Debian' else 'openssl'
+    )
+  }}
 
 # To deploy a systemd unit file
 # pulsar_systemd: true
