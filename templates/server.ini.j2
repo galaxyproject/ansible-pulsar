@@ -15,7 +15,7 @@ host = {{ pulsar_host }}
 ## pem file to use to enable SSL. Set to * to generate one
 ## automatically.
 {% if pulsar_ssl_pem is defined %}
-ssl_pem = host.pem
+ssl_pem = {{ pulsar_ssl_pem }}
 {% endif %}
 
 [app:main]
@@ -60,7 +60,7 @@ port = 8913
 
 ## Configure Python loggers.
 [loggers]
-keys = root,pulsar
+keys = root,pulsar,galaxy
 
 [handlers]
 keys = console
@@ -73,9 +73,15 @@ level = INFO
 handlers = console
 
 [logger_pulsar]
-level = DEBUG
+level = {{ pulsar_log_level }}
 handlers = console
 qualname = pulsar
+propagate = 0
+
+[logger_galaxy]
+level = {{ pulsar_log_level }}
+handlers = console
+qualname = galaxy
 propagate = 0
 
 [handler_console]

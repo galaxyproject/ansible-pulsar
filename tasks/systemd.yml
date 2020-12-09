@@ -1,0 +1,18 @@
+---
+- name: Setup systemd
+  block:
+    - name: Create Pulsar systemd unit file
+      template:
+        src: "pulsar.service.j2"
+        dest: "/etc/systemd/system/{{ pulsar_systemd_service_name }}.service"
+
+    - name: systemd daemon-reload and enable/start service
+      systemd:
+        state: "{{ pulsar_systemd_state }}"
+        enabled: "{{ pulsar_systemd_enabled }}"
+        name: "{{ pulsar_systemd_service_name }}.service"
+        daemon_reload: yes
+
+  remote_user: "{{ pulsar_remote_users.root | default(__pulsar_remote_user) }}"
+  become: "{{ true if pulsar_become_users.root is defined else __pulsar_become }}"
+  become_user: "{{ pulsar_become_users.root | default(__pulsar_become_user) }}"

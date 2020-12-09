@@ -17,20 +17,23 @@ easily be installed via a pre-task in the same play as this role:
 
     - hosts: pulsarservers
         pre_tasks:
-          - name: Install Mercurial
-            apt: pkg={{ item }} state=installed
-            sudo: yes
+          - name: Install dependencies
+            package:
+              name:
+                - git
+                - virtualenv
+                - python3
+            become: true
             when: ansible_os_family = 'Debian'
-            with_items:
-              - git
-              - python-virtualenv
-          - name: Install Mercurial
-            yum: pkg={{ item }} state=installed
-            sudo: yes
+          - name: Install dependencies
+            package:
+              name:
+                - git
+                - python36-virtualenv
+                - python3
+              state: present
+            become: true
             when: ansible_os_family = 'RedHat'
-            with_items:
-              - git
-              - python-virtualenv
         roles:
           - galaxyproject.pulsar
 
@@ -41,45 +44,45 @@ the `pip_virtualenv_command` variable.
 [venv]: http://virtualenv.readthedocs.org/
 [pip]: http://pip.readthedocs.org/
 
+Breaking Changes
+----------------
+
+As of 1.0.0, installation directly from source using `git clone` is no longer supported. However, `pulsar_package_name` and `pulsar_package_version` can be used to install using pip's `git+https` method.
+
 Role Variables
 --------------
 
 ### Required variables ###
 
-- `pulsar_server_dir`: Filesystem path where the Pulsar server will be
-  installed.
-
-**Although not required, you are strongly encouraged to set
-`pulsar_pip_install` to `true` (see below).**
+- `pulsar_root`: Filesystem path under which Pulsar virtualenv, configs, etc. will be installed. Formerly
+  `pulsar_server_dir`
 
 ### Optional variables ###
 
 You can control various things about where you get Pulsar from, what version
 you use, and where its configuration files will be placed:
 
-- `pulsar_pip_install` (default: `false`): For legacy reasons, this role will
-  install Pulsar by cloning it from git. If set to `true`, Pulsar will be
-  installed from pip instead.
-- `pulsar_yaml_config`: a YAML dictionary whose contents will be used to create
-  Pulsar's app.yml
-- `pulsar_git_repo` (default: `https://github.com/galaxyproject/pulsar`):
-  Upstream git repository from which Pulsar should be cloned.
-- `pulsar_changeset_id` (default: `master`): A changeset id, tag, branch, or
-  other valid git identifier for which changeset Pulsar should be updated to.
-  This is also possible when installing from pip (pulsar will be installed
-  using the `git+https://` pip scheme).
-- `pulsar_venv_dir` (default: `<pulsar_server_dir>/venv` if installing via pip,
-  `<pulsar_server_dir>/.venv` if not): The role will create a
-  [virtualenv][virtualenv] from which Pulsar will run, this controls where the
-  virtualenv will be placed.
-- `pulsar_config_dir` (default: `<pulsar_server_dir>/config` if installing via
-  pip, `<pulsar_server_dir>` if not): Directory that will be used for Pulsar
-  configuration files.
-- `pulsar_optional_dependencies` (default: None): List of optional dependency
-  modules to install. Whether or not you need these depends on what features
-  you are enabling.
-- `pulsar_install_environments` (default: None): Installing dependencies may
-  require setting certain environment variables to compile successfully.
+- `pulsar_yaml_config`: a YAML dictionary whose contents will be used to create Pulsar's app.yml
+- `pulsar_venv_dir` (default: `<pulsar_root>/venv`): The role will create a [virtualenv][virtualenv] from which Pulsar
+  will run, this controls where the virtualenv will be placed.
+- `pulsar_config_dir` (default: `<pulsar_root>/config`): Directory that will be used for Pulsar configuration files.
+- `pulsar_optional_dependencies` (default: None): List of optional dependency modules to install. Whether or not you
+  need these depends on what features you are enabling.
+
+
+**User management and privilege separation**
+
+- `pulsar_separate_privileges` (default: `no`): Enable privilege separation mode.
+- `pulsar_user` (default: user running ansible): The name of the system user under which pulsar runs. (or,
+  `{name: pulsar, shell: /bin/bash}`)
+- `pulsar_privsep_user` (default: `root`): The name of the system user that owns the pulsar code, config files, and
+  virtualenv (and dependencies therein).
+- `pulsar_group`: Common group between the pulsar user and privilege separation user. If set directories containing
+  potentially sensitive information such as the pulsar config file will be created group- but not world-readable.
+  Otherwise, directories are created world-readable.
+- `pulsar_create_user` (default: `no`): Create the pulsar user. Running as a dedicated user is a best practice, but most
+  production pulsar instances submitting jobs to a cluster will manage users in a directory service (e.g.  LDAP). This
+  option is useful for standalone servers. Requires superuser privileges.
 
 
 Additional options from Pulsar's `server.ini` are configurable via the
@@ -97,10 +100,9 @@ documentation][pulsardocs] and `server.ini.sample`):
 Legacy options (if `pulsar_yaml_config` is unset, these will be used to
 populate the `[app:main]` section of `server.ini`):
 
-- `pulsar_dependencies_dir` (default: `<pulsar_server_dir>/deps`)
-- `pulsar_persistence_dir` (default:
-  `<pulsar_server_dir>/files/persisted_data`)
-- `pulsar_staging_dir` (default: `<pulsar_server_dir>/files/staging`)
+- `pulsar_dependencies_dir` (default: `<pulsar_root>/deps`)
+- `pulsar_persistence_dir` (default: `<pulsar_root>/files/persisted_data`)
+- `pulsar_staging_dir` (default: `<pulsar_root>/files/staging`)
 - `pulsar_drmaa_library_path`
 - `pulsar_job_managers` (default: None): The contents of the legacy job
   managers configuration file (job_managers.ini by default).
@@ -130,20 +132,6 @@ Many of these dependencies have their own dependencies. A nice future
 enhancement to this role would be to install the dependencies' dependencies via
 the system package manager if desired.
 
-### pulsar_install_environments ###
-
-Some sites may need to set environment variables when installing certain
-modules, e.g. to point pyOpenSSL at a non-standard OpenSSL or libffi locations,
-or to instruct pycurl to use the NSS library:
-
-    pulsar_install_environments:
-      pyOpenSSL:
-        PKG_CONFIG_PATH: "/opt/site/libffi/lib64/pkgconfig"
-        CFLAGS: "-I/opt/site/openssl/include"
-        LDFLAGS: "-L/opt/site/openssl/lib"
-      pycurl:
-        PYCURL_SSL_LIBRARY: "nss"
-
 [pulsardocs]: http://pulsar.readthedocs.org/
 
 Dependencies
@@ -159,7 +147,7 @@ Install Pulsar on your local system with all the default options:
     - hosts: localhost
       connection: local
       vars:
-        pulsar_server_dir: /home/nate/pulsar
+        pulsar_root: /home/nate/pulsar
       roles:
         - role: galaxyproject.pulsar
 
@@ -168,11 +156,9 @@ Install Pulsar with directory separation and also install Galaxy:
 
     - hosts: pulsarservers
       vars:
-        pulsar_venv_dir: /opt/pulsar/venv
-        pulsar_server_dir: /opt/pulsar/server
-        pulsar_config_dir: /opt/pulsar/config
+        pulsar_root: /opt/pulsar
         pulsar_persistence_dir: /var/opt/pulsar/persisted_data
-        pulsar_staging_dir: /var/opt/pulsar/staging"
+        pulsar_staging_dir: /var/opt/pulsar/staging
         pulsar_optional_dependencies:
           - pyOpenSSL
           - pycurl
@@ -187,9 +173,6 @@ Install Pulsar with directory separation and also install Galaxy:
         galaxy_config_files:
           - name: files/galaxy/config/datatypes_conf.xml
             dest: "{{ galaxy_config_dir }}/datatypes_conf.xml"
-      pre_tasks:
-        - name: Install Mercurial
-          pip: name=mercurial virtualenv={{ hg_virtualenv }} virtualenv_command={{ pip_virtualenv_command | default(omit) }}
       roles:
         - role: galaxyproject.pulsar
         # Install with:
@@ -197,6 +180,54 @@ Install Pulsar with directory separation and also install Galaxy:
         - role: galaxyproject.galaxy
           galaxy_manage_mutable_setup: no
           galaxy_manage_database: no
+          
+Install Pulsar into a Centos7 host with directory and privilege separation, systemd service configuration, 
+webless mode and communication via a message queue:
+
+    - hosts: pulsarservers
+      vars:
+        pulsar_root: /opt/pulsar
+        pulsar_persistence_dir: /var/opt/pulsar/persisted_data
+        pulsar_staging_dir: /var/opt/pulsar/staging
+        pulsar_dependencies_dir: /var/opt/pulsar/deps
+        pulsar_optional_dependencies:
+          - pycurl
+          - kombu
+          - psutil
+        pulsar_systemd: true
+        pulsar_systemd_runner: webless
+        pulsar_separate_privileges: yes
+        pulsar_privsep_user: centos
+        pulsar_yaml_config:
+          conda_auto_init: true
+          conda_auto_install: true
+          assign_ids: none
+          message_queue_url: "message_queue_url"
+          min_polling_interval: 0.5
+          persistence_directory: "{{ pulsar_persistence_dir }}"
+          staging_directory: "{{ pulsar_staging_dir }}"
+          tool_dependency_dir: "{{ pulsar_dependencies_dir }}"
+          managers:
+            production:
+              submit_universe: vanilla
+              type: queued_condor
+            test:
+              submit_universe: vanilla
+              type: queued_condor    
+      pre_tasks:
+        - name: Install dependencies
+          become: yes
+          package:
+            state: latest
+            name:
+            - git
+            - python-virtualenv
+            - python3
+            - curl
+            - libcurl-devel    
+      roles:
+        - role: galaxyproject.pulsar
+  
 
 License
 -------
@@ -208,5 +239,6 @@ License
 Author Information
 ------------------
 
-[John Chilton](https://github.com/jmchilton)  
-[Nate Coraor](https://github.com/natefoo)
+- [John Chilton](https://github.com/jmchilton)
+- [Nate Coraor](https://github.com/natefoo)
+- [Helena Rasche](https://github.com/erasche)
