@@ -1,0 +1,32 @@
+[Unit]
+Description=Pulsar
+After=network.target
+After=time-sync.target
+After=syslog.target
+
+[Service]
+UMask=022
+Type=simple
+User={{ __pulsar_user_name }}
+Group={{ __pulsar_user_group }}
+TimeoutStartSec=30
+{% if pulsar_systemd_runner == "paste" %}
+ExecStart={{ pulsar_venv_dir }}/bin/python {{ pulsar_venv_dir }}/bin/paster serve {{ pulsar_config_dir }}/server.ini
+{% elif pulsar_systemd_runner == "webless" %}
+Environment=PULSAR_VIRTUALENV={{ pulsar_venv_dir }}
+ExecStart={{ pulsar_venv_dir }}/bin/pulsar -c {{ pulsar_config_dir }} -m webless
+{% else %}
+ExecStart={{ pulsar_venv_dir }}/bin/uwsgi --ini-paste {{ pulsar_config_dir }}/server.ini
+{% endif %}
+{% for env in pulsar_systemd_environment %}
+Environment={{ env }}
+{% endfor %}
+MemoryLimit={{ pulsar_systemd_memory_limit }}G
+Restart=always
+
+MemoryAccounting=yes
+CPUAccounting=yes
+BlockIOAccounting=yes
+
+[Install]
+WantedBy=multi-user.target
