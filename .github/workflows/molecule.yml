@@ -1,0 +1,42 @@
+---
+name: Molecule
+
+on: [pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          path: "${{ github.repository }}"
+      - name: molecule
+        uses: robertdebock/molecule-action@2.6.6
+        with:
+          command: lint
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        config:
+          - image: "centos"
+            tag: "7"
+          - image: "ubuntu"
+            tag: "16.04"
+          - image: "ubuntu"
+            tag: "18.04"
+          #- image: "ubuntu"
+          #  tag: "20.04"
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          path: "${{ github.repository }}"
+      - name: molecule
+        uses: robertdebock/molecule-action@2.6.6
+        with:
+          image: "${{ matrix.config.image }}"
+          tag: "${{ matrix.config.tag }}"
+          options: "--parallel all"
+        env:
+          TOX_PARALLEL_NO_SPINNER: 1
