@@ -13,7 +13,7 @@ pulsar_job_metrics_config_file: "{{ pulsar_config_dir }}/job_metrics_conf.xml"
 pulsar_root: "{{ pulsar_server_dir }}"
 
 # Paths
-pulsar_dependencies_dir: "{{ pulsar_root }}/deps"
+pulsar_dependencies_dir: "{{ pulsar_root }}/dependencies"
 pulsar_venv_dir: "{{ pulsar_root }}/venv"
 pulsar_persistence_dir: "{{ pulsar_root }}/files/persisted_data"
 pulsar_staging_dir: "{{ pulsar_root }}/files/staging"
