@@ -17,17 +17,20 @@
         dest: "{{ pulsar_config_dir }}/app.yml"
         mode: 0444
         backup: yes
-      when: pulsar_yaml_config is defined
       notify:
         - "{{ pulsar_restart_handler_name | default('default restart pulsar handler') }}"
 
-    - name: Create Pulsar job manager configuration file
+    - name: Create Pulsar job metrics configuration file
       template:
-        src: "job_managers.ini.j2"
-        dest: "{{ pulsar_job_managers_config }}"
-        mode: 0444
-        backup: yes
-      when: pulsar_job_managers is defined
+        src: "plugin_config.yml.j2"
+        # this uses Python os.path.join which effectively ignores the previous elements in the list if later elements
+        # are absolute paths, so this works regardless of whether pulsar_yaml_config_merged.job_metrics_config_file is
+        # relative or absolute
+        dest: "{{ (pulsar_config_dir, pulsar_yaml_config_merged.job_metrics_config_file) | path_join }}"
+        mode: "0644"
+      vars:
+        __pulsar_plugin_config: "{{ pulsar_job_metrics_plugins }}"
+      when: pulsar_job_metrics_plugins is defined
       notify:
         - "{{ pulsar_restart_handler_name | default('default restart pulsar handler') }}"
 
@@ -37,11 +40,9 @@
         dest: "{{ pulsar_config_dir }}/{{ item }}"
         mode: 0444
         backup: yes
-      with_items:
+      loop:
         - server.ini
         - local_env.sh
-        - job_metrics_conf.xml
-        - dependency_resolvers_conf.xml
       notify:
         - "{{ pulsar_restart_handler_name | default('default restart pulsar handler') }}"
 

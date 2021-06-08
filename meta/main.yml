@@ -1,10 +1,13 @@
 ---
 galaxy_info:
+  namespace: galaxyproject
+  role_name: pulsar
   author: The Galaxy Project
   description: Install and manage a Pulsar (http://github.com/galaxyproject/pulsar) server.
   company: The Galaxy Project
   license: AFL v3.0
-  min_ansible_version: 1.4
+  min_ansible_version: 2.8
+  github_branch: main
   platforms:
   - name: EL
     versions:

@@ -5,18 +5,14 @@ pulsar_package_name: pulsar-app
 
 pulsar_log_level: DEBUG
 
-# High-level Pulsar configuration parameters
-pulsar_job_managers_config: "{{ pulsar_config_dir }}/job_managers.ini"
-pulsar_job_metrics_config_file: "{{ pulsar_config_dir }}/job_metrics_conf.xml"
-
 # For legacy purposes
 pulsar_root: "{{ pulsar_server_dir }}"
 
 # Paths
 pulsar_dependencies_dir: "{{ pulsar_root }}/deps"
-pulsar_venv_dir: "{{ pulsar_root }}/venv"
 pulsar_persistence_dir: "{{ pulsar_root }}/files/persisted_data"
 pulsar_staging_dir: "{{ pulsar_root }}/files/staging"
+pulsar_venv_dir: "{{ pulsar_root }}/venv"
 pulsar_config_dir: "{{ pulsar_root }}/config"
 
 # Optional message queue configuration
@@ -30,22 +26,24 @@ pulsar_port: 8913
 # Optional ssl key for SSL web server
 # pulsar_ssl_pem:
 
-pulsar_dependency_resolvers:
-  - name: conda
-    #args:
-    #  - name: auto_init
-    #    value: true
-  - name: tool_shed_packages
-  - name: galaxy_packages
+# Default options for Pulsar app.yml
+pulsar_yaml_config_default:
+  tool_dependency_dir: "{{ pulsar_dependencies_dir }}"
+  persistence_directory: "{{ pulsar_persistence_dir }}"
+  staging_directory: "{{ pulsar_staging_dir }}"
+  # Static configs that default to .xml files in the config dir but the role writes as .yml if configured
+  job_metrics_config_file: "job_metrics_conf.{{ (pulsar_job_metrics_plugins is defined) | ternary('yml', 'xml') }}"
 
-pulsar_job_metrics_plugins:
-  - name: core
-  - name: cpuinfo
-    args:
-      - name: verbose
-        value: "true"
-  - name: meminfo
-  - name: uname
+pulsar_yaml_config_merged: "{{ pulsar_yaml_config_default | combine(pulsar_yaml_config | default({})) }}"
+
+#pulsar_job_metrics_plugins:
+#  - name: core
+#  - name: cpuinfo
+#    args:
+#      - name: verbose
+#        value: "true"
+#  - name: meminfo
+#  - name: uname
 
 # job_managers.ini contents
 #pulsar_job_managers:
