@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<!--
-    This file is maintained by Ansible - CHANGES WILL BE OVERWRITTEN
--->
-<job_metrics>
-{% for plugin in pulsar_job_metrics_plugins %}
-    <{{ plugin.name }}{% for arg in plugin.args |default([]) %} {{ arg.name }}="{{ arg.value }}"{% endfor %} />
-{% endfor %}
-</job_metrics>

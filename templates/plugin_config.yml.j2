@@ -1,0 +1,16 @@
+---
+##
+## This file is managed by Ansible.  ALL CHANGES WILL BE OVERWRITTEN.
+##
+{% if 'name' in (__pulsar_plugin_config | first).keys() %}
+{# Old style (deprecated) YAML-to-XML structure #}
+{% for plugin in __pulsar_plugin_config %}
+- type: {{ plugin.name }}
+{% for arg in plugin.args | default([]) %}
+  {{ arg.name }}: {{ arg.value }}
+{% endfor %}
+{% endfor %}
+{% else %}
+{# New style Galaxy plugin_config YAML #}
+{{ __pulsar_plugin_config | to_nice_yaml }}
+{% endif %}

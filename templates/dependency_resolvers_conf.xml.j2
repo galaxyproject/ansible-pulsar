@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<!--
-    This file is maintained by Ansible - CHANGES WILL BE OVERWRITTEN
--->
-<dependency_resolvers>
-{% for resolver in pulsar_dependency_resolvers %}
-    <{{ resolver.name }}{% for arg in resolver.args |default([]) %} {{ arg.name }}="{{ arg.value }}"{% endfor %} />
-{% endfor %}
-</dependency_resolvers>
