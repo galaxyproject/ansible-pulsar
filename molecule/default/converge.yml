@@ -35,6 +35,7 @@
         - python3-dev
         - python3-pkg-resources
         - python3-setuptools
+        - python3-virtualenv
 
     - name: "[CentOS 7] Install dependencies"
       yum:
