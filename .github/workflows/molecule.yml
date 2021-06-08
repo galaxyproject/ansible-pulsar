@@ -22,11 +22,9 @@ jobs:
           - image: "centos"
             tag: "7"
           - image: "ubuntu"
-            tag: "16.04"
-          - image: "ubuntu"
             tag: "18.04"
-          #- image: "ubuntu"
-          #  tag: "20.04"
+          - image: "ubuntu"
+            tag: "20.04"
     steps:
       - name: checkout
         uses: actions/checkout@v2
