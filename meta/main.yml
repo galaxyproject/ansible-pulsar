@@ -6,7 +6,7 @@ galaxy_info:
   description: Install and manage a Pulsar (http://github.com/galaxyproject/pulsar) server.
   company: The Galaxy Project
   license: AFL v3.0
-  min_ansible_version: 2.8
+  min_ansible_version: 2.10
   github_branch: main
   platforms:
   - name: EL

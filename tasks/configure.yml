@@ -8,6 +8,7 @@
       file:
         state: directory
         path: "{{ pulsar_config_dir }}"
+        mode: "0755"
       notify:
         - "{{ pulsar_restart_handler_name | default('default restart pulsar handler') }}"
 
@@ -15,7 +16,7 @@
       template:
         src: app.yml.j2
         dest: "{{ pulsar_config_dir }}/app.yml"
-        mode: 0444
+        mode: "0444"
         backup: yes
       notify:
         - "{{ pulsar_restart_handler_name | default('default restart pulsar handler') }}"
