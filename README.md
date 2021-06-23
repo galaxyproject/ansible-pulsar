@@ -24,7 +24,7 @@ pre-task in the same play as this role:
           - virtualenv
           - python3
       become: true
-      when: ansible_os_family = 'Debian'
+      when: ansible_os_family == 'Debian'
     - name: Install dependencies
       package:
         name:
@@ -33,7 +33,7 @@ pre-task in the same play as this role:
           - python3
         state: present
       become: true
-      when: ansible_os_family = 'RedHat'
+      when: ansible_os_family == 'RedHat'
   roles:
     - galaxyproject.pulsar
 ```
