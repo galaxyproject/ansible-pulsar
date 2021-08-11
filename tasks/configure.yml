@@ -4,14 +4,6 @@
 - name: Static config setup
   block:
 
-    - name: Create Pulsar config dir
-      file:
-        state: directory
-        path: "{{ pulsar_config_dir }}"
-        mode: "0755"
-      notify:
-        - "{{ pulsar_restart_handler_name | default('default restart pulsar handler') }}"
-
     - name: Create Pulsar app configuration file
       template:
         src: app.yml.j2
