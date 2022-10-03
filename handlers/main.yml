@@ -4,9 +4,11 @@
   debug:
     msg: "RESTARTER NOT IMPLEMENTED - Please restart pulsar manually. You can define your own handler and enable it with `pulsar_restart_handler_name`"
   when: not pulsar_systemd
+  listen: default restart pulsar handler
 
 - name: default restart pulsar handler
   systemd:
     name: "{{ pulsar_systemd_service_name }}.service"
     state: restarted
   when: pulsar_systemd
+  listen: default restart pulsar handler
