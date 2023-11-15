@@ -28,5 +28,9 @@ MemoryAccounting=yes
 CPUAccounting=yes
 BlockIOAccounting=yes
 
+{% for opt in pulsar_systemd_service_options | dict2items %}
+{{ opt.key }}={{ opt.value }}
+{% endfor %}
+
 [Install]
 WantedBy=multi-user.target

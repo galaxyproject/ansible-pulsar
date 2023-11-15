@@ -73,6 +73,8 @@ pulsar_systemd_state: started
 pulsar_systemd_memory_limit: 6 # Gigabytes
 pulsar_systemd_runner: paste # Or webless or uWSGI, but uwsgi doesn't restart right.
 pulsar_systemd_environment: [] # List of VAR=value
+pulsar_systemd_service_options: {} # Dict of OptName: OptValue
+
 
 
 # User management
