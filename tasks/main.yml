@@ -25,6 +25,7 @@
 
 - name: Include virtualenv setup tasks
   include_tasks: virtualenv.yml
+  when: pulsar_install_virtualenv
 
 - name: Include config files tasks
   include_tasks: configure.yml
