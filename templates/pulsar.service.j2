@@ -21,7 +21,11 @@ ExecStart={{ pulsar_venv_dir }}/bin/uwsgi --ini-paste {{ pulsar_config_dir }}/se
 {% for env in pulsar_systemd_environment %}
 Environment={{ env }}
 {% endfor %}
+{% if ansible_os_family | lower == 'redhat' and ansible_distribution_major_version | int >= 8 %}
+MemoryMax={{ pulsar_systemd_memory_limit }}G
+{% else %}
 MemoryLimit={{ pulsar_systemd_memory_limit }}G
+{% endif %}
 Restart=always
 
 MemoryAccounting=yes
