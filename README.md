@@ -115,7 +115,8 @@ Pulsar on to uses [systemd][systemd], the role can automatically start Pulsar an
 - `pulsar_systemd_memory_limit` (default: `6`): Size (in GB) of memory limit. If Pulsar uses more than this limit, the
   system will kill (and attempt to restart) it.
 - `pulsar_systemd_runner` (default: `paste`): Whether to start Pulsar with a web server and, if so, what web server. If
-  using Pulsar in AMQP "message mode", set this to `webless`. Valid values are `paste`, `webless`, `uwsgi`
+  using Pulsar in AMQP "message mode", set this to `webless`. Valid values are `paste`, `webless`, `pulsar-main`, and
+  `uwsgi`.
 - `pulsar_systemd_environment`: A list of `VAR=value` strings to be added as `Environment=VAR=val` to the systemd
   service unit
 - `pulsar_systemd_unit_options`: A dictionary of extra OptName: OptValue options to add to the `[Unit]` section of the
