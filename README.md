@@ -99,13 +99,14 @@ For details about the Pulsar application configuration options, consult the [Pul
 **systemd support**
 
 By default, this role does not configure Pulsar to start and stop automatically, but if the system you are installing
-Pulsar on to uses [systemd][systemd] and you have root privileges on that system (required to install the systemd
-service unit that controls Pulsar; Pulsar does not run as root), the role can automatically start Pulsar and restart it
-as needed.
+Pulsar on to uses [systemd][systemd], the role can automatically start Pulsar and restart it as needed.
 
 - `pulsar_systemd` (default: `false`): Set to `true` to enable configuration and management of systemd by this role.
 - `pulsar_systemd_enabled` (default: `true`): Set to `false` to configure Pulsar in systemd but disable automatic
   starting on boot.
+- `pulsar_systemd_root` (default: `true`): Install the systemd service unit as the `root` user in `/etc/systemd/system`.
+  If set to `false`, the unit is installed to `~/.config/systemd/user` as the Pulsar user and `systemctl --user` is used
+  to control the service.
 - `pulsar_systemd_service_name` (default: `pulsar`): systemd service name for the Pulsar service. If you want to run
   multiple Pulsar servers on the same system, you can use this variable to prevent collision of the systemd services and
   service unit file names.
@@ -114,9 +115,14 @@ as needed.
 - `pulsar_systemd_memory_limit` (default: `6`): Size (in GB) of memory limit. If Pulsar uses more than this limit, the
   system will kill (and attempt to restart) it.
 - `pulsar_systemd_runner` (default: `paste`): Whether to start Pulsar with a web server and, if so, what web server. If
-  using Pulsar in AMQP "message mode", set this to `webless`. Valid values are `paste`, `webless`, `uwsgi`
+  using Pulsar in AMQP "message mode", set this to `webless`. Valid values are `paste`, `webless`, `pulsar-main`, and
+  `uwsgi`.
 - `pulsar_systemd_environment`: A list of `VAR=value` strings to be added as `Environment=VAR=val` to the systemd
   service unit
+- `pulsar_systemd_unit_options`: A dictionary of extra OptName: OptValue options to add to the `[Unit]` section of the
+  service unit.
+- `pulsar_systemd_service_options`: A dictionary of extra OptName: OptValue options to add to the `[Service]` section of
+  the service unit.
 
 **Web server configuration**
 

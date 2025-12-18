@@ -3,8 +3,10 @@
   block:
     - name: Create Pulsar systemd unit file
       template:
+        owner: "{{ pulsar_systemd_root | ternary('root', omit) }}"
+        group: "{{ pulsar_systemd_root | ternary('root', omit) }}"
         src: "pulsar.service.j2"
-        dest: "/etc/systemd/system/{{ pulsar_systemd_service_name }}.service"
+        dest: "{{ pulsar_systemd_root | ternary('/etc/systemd/system/', ('~' ~ __pulsar_user_name ~ '/.config/systemd/user') | expanduser) }}/{{ pulsar_systemd_service_name }}.service"
         mode: "0644"
 
     - name: systemd daemon-reload and enable/start service
@@ -13,6 +15,7 @@
         enabled: "{{ pulsar_systemd_enabled }}"
         name: "{{ pulsar_systemd_service_name }}.service"
         daemon_reload: yes
+        scope: "{{ pulsar_systemd_root | ternary(omit, 'user') }}"
 
   remote_user: "{{ pulsar_remote_users.root | default(__pulsar_remote_user) }}"
   become: "{{ true if pulsar_become_users.root is defined else __pulsar_become }}"
