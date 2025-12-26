@@ -18,6 +18,11 @@ pulsar_config_dir: "{{ pulsar_root }}/config"
 # Optional message queue configuration
 # pulsar_message_queue_url:
 
+# Whether to create a virtualenv for pulsar or not
+# Useful to toggle it off when creating additional pulsar services on the
+# same host and share the same virtualenv
+pulsar_install_virtualenv: true
+
 # Additional options for uWSGI
 pulsar_uwsgi_options: {}
 
