@@ -5,7 +5,7 @@ After=time-sync.target
 After=syslog.target
 
 [Service]
-UMask=022
+UMask=027
 Type=simple
 User={{ __pulsar_user_name }}
 Group={{ __pulsar_user_group }}
