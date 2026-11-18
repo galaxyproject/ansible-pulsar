@@ -77,6 +77,9 @@ pulsar_systemd_unit_options: {} # [Unit] section extra options, Dict of OptName:
 pulsar_systemd_service_options: {} # [Service] section extra options, Dict of OptName: OptValue
 pulsar_systemd_root: true # Install as a user unit
 
+# Whether the Pulsar venv should be completely removed prior to dependency installation, often a good idea to set once
+# when upgrading between Pulsar releases
+pulsar_force_clean_virtualenv: false
 
 
 # User management
