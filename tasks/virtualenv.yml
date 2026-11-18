@@ -8,6 +8,16 @@
 - name: Manage dependencies
   block:
 
+    - name: Remove Pulsar virtualenv if requested
+      file:
+        name: "{{ pulsar_venv_dir }}"
+        state: absent
+      when:
+        - pulsar_force_clean_virtualenv | bool
+        - not (__pulsar_venv_cleaned | default(false))
+      notify:
+        - "{{ pulsar_restart_handler_name | default('default restart pulsar handler') }}"
+
     - name: Create Pulsar virtualenv
       pip:
         name: pip
@@ -40,6 +50,8 @@
       environment:
         PYTHONPATH: null
         VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
+      notify:
+        - "{{ pulsar_restart_handler_name | default('default restart pulsar handler') }}"
 
     - name: Install Pulsar dependencies (optional)
       pip:
@@ -52,6 +64,8 @@
         PYTHONPATH: null
         VIRTUAL_ENV: "{{ pulsar_venv_dir }}"
         PYCURL_SSL_LIBRARY: "{{ pulsar_pycurl_ssl_library }}"
+      notify:
+        - "{{ pulsar_restart_handler_name | default('default restart pulsar handler') }}"
 
   remote_user: "{{ pulsar_remote_users.privsep | default(__pulsar_remote_user) }}"
   become: "{{ true if pulsar_become_users.privsep is defined else __pulsar_become }}"
