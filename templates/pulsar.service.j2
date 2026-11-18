@@ -1,20 +1,30 @@
+##
+## This file is maintained by Ansible - CHANGES WILL BE OVERWRITTEN
+##
 [Unit]
 Description=Pulsar
 After=network.target
 After=time-sync.target
 After=syslog.target
+{% for opt in pulsar_systemd_unit_options | dict2items %}
+{{ opt.key }}={{ opt.value }}
+{% endfor %}
 
 [Service]
 UMask=022
 Type=simple
+{% if pulsar_systemd_root %}
 User={{ __pulsar_user_name }}
 Group={{ __pulsar_user_group }}
+{% endif %}
 TimeoutStartSec=30
 {% if pulsar_systemd_runner == "paste" %}
 ExecStart={{ pulsar_venv_dir }}/bin/python {{ pulsar_venv_dir }}/bin/paster serve {{ pulsar_config_dir }}/server.ini
 {% elif pulsar_systemd_runner == "webless" %}
 Environment=PULSAR_VIRTUALENV={{ pulsar_venv_dir }}
 ExecStart={{ pulsar_venv_dir }}/bin/pulsar -c {{ pulsar_config_dir }} -m webless
+{% elif pulsar_systemd_runner == "pulsar-main" %}
+ExecStart={{ pulsar_venv_dir }}/bin/pulsar-main -c {{ pulsar_config_dir }}
 {% else %}
 ExecStart={{ pulsar_venv_dir }}/bin/uwsgi --ini-paste {{ pulsar_config_dir }}/server.ini
 {% endif %}
@@ -37,4 +47,4 @@ BlockIOAccounting=yes
 {% endfor %}
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={{ pulsar_systemd_wanted_by | default("multi-user.target") }}
